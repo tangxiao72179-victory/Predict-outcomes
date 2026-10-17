@@ -1,0 +1,54 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+np.random.seed(42)
+data_size = 200
+df = pd.DataFrame(
+    {
+        "Age": np.random.randint(18, 65, size=data_size),
+        "Annual_Income_k": np.random.normal(60, 15, size=data_size).astype(int),
+        "Spending_Score": np.random.randint(1, 100, size=data_size),
+        "Is_Subscriber": np.random.choice(["Yes", "No"], size=data_size),
+    }
+)
+
+print(df.head(), "\n")
+print(df.info(), "\n")
+print(df.describe().T, "\n")
+print(df.isnull().sum(), "\n")
+
+sns.set_theme(style="whitegrid")
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+sns.histplot(data=df, x="Annual_Income_k", kde=True, ax=axes[0], color="skyblue")
+axes[0].set_title("Distribution of Annual Income")
+
+sns.boxplot(
+    data=df, x="Is_Subscriber", y="Spending_Score", ax=axes[1], palette="Set2"
+)
+axes[1].set_title("Spending Score by Subscriber Status")
+
+plt.tight_layout()
+plt.show()
+
+numerical_df = df.select_dtypes(include=[np.number])
+correlation_matrix = numerical_df.corr()
+print(correlation_matrix, "\n")
+
+plt.figure(figsize=(6, 4))
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
+plt.title("Correlation Matrix Heatmap")
+plt.show()
+
+report = f"""
+1. DATA PROFILE:
+- Total Observations: {df.shape[0]} rows across {df.shape[1]} features.
+- Missing values found: {'No' if df.isnull().sum().sum() == 0 else 'Yes'}.
+
+2. INFLUENCING FACTORS & TRENDS:
+- Top numeric correlation: Highest coefficient observed in matrix above.
+- Distribution check: Visual charts outline key spending patterns.
+"""
+print(report)
